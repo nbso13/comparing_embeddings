@@ -1,5 +1,8 @@
-I had a lot of trouble downloading and using the fastText python module for windows. I got a tutorial from here, where u/abulhawa gives instructions on how to run the module on vscode.
+I had a lot of trouble downloading and using the fastText python module for windows. I found a tutorial (https://github.com/facebookresearch/fastText/issues/548), where u/abulhawa gives instructions on how to run the module on vscode, but I gave up on that route.
+tldr: Beware if you don't use unix.
 
-https://github.com/facebookresearch/fastText/issues/548
+You can install the python module for fasttext with:
+	sudo pip install fasttext
+You need numpy and scipy as well
 
-If this does not work, I will create a new VM for using the module and ssh in.
+
