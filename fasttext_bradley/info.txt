@@ -1,8 +1,29 @@
-I had a lot of trouble downloading and using the fastText python module for windows. I found a tutorial (https://github.com/facebookresearch/fastText/issues/548), where u/abulhawa gives instructions on how to run the module on vscode, but I gave up on that route.
-tldr: Beware if you don't use unix.
+////////// HELPFUL LINKS AND INFO \\\\\\\\\\
+How does fastText classifier work under the hood?
+https://towardsdatascience.com/fasttext-bag-of-tricks-for-efficient-text-classification-513ba9e302e7
+
+FastText text classification tutorial
+https://fasttext.cc/docs/en/supervised-tutorial.html
+
+////////// USING FASTTEXT \\\\\\\\\\
+
+I had a lot of trouble downloading and using the fastText python module and the command line functions for windows. I found a tutorial (https://github.com/facebookresearch/fastText/issues/548), where u/abulhawa gives instructions on how to run the python module on vscode in windows 10, but I gave up on that route.
+tldr: Beware if you don't use a unix system.
 
 You can install the python module for fasttext with:
 	sudo pip install fasttext
-You need numpy and scipy as well
+You will need numpy and scipy as well.
 
+To view the manual page:
+	$ python
+	>>> import fasttext
+	>>> help(fasttext.FastText)
 
+Before we create a model, the data must first be preprocessed and the text encoded as UTF-8
+Encoding can be done simply with str.encode(), but the kaggle dataset is already correctly uncoded.
+Garrett did a wonderful job cleaning and lemizing the data, so the hard work is already done. The rest of the preprocessing is about getting the desired format. The dataset must be converted to a text file with the proper data format so that the model can be trained.
+The data format for fasttext is: 
+	__label__<X>__label__<Y> ... <Text>
+Where X and Y are class labels.
+
+That means taking in the json dataset and producing a text file.

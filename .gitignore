@@ -1,1 +1,6 @@
 .Reviews.json
+.reviews_test.json
+.reviews_train.json
+
+.get-pip.py
+
