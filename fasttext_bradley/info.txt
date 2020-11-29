@@ -1,0 +1,55 @@
+Here is a brief document explaining how to use the fasttext classifiers for our project.
+
+////////// TODO \\\\\\\\\\
+It is still unclear to me why I can't make a model with supervised training that uses continuous bag-of-words embeddings, which is frustrating.
+One idea I had for still finding interesting data would be to vary the character n-gram size, but still the difference is not as substantive as it would be if we could compare to cbow.
+
+Another todo is finding a way to meaningfully represent the word vectors and the change in the model as it trains.
+
+
+
+////////// USING FASTTEXT \\\\\\\\\\
+First, make sure you have the "Reviews.json" file in the same directory as the "fasttext_evaluation" jupyter notebook.
+Then just open the notebook "fasttext_evaluation" and enjoy!
+
+
+
+////////// MAKING FASTTEXT \\\\\\\\\\
+I had a lot of trouble downloading and using the fastText python module and the command line functions for windows. I found a tutorial (https://github.com/facebookresearch/fastText/issues/548), where u/abulhawa gives instructions on how to run the python module on vscode in windows 10, but I gave up on that route.
+tldr: Beware if you don't use a unix system.
+
+You can install the python module for fasttext with:
+	sudo pip install fasttext
+You will need numpy and scipy as well.
+But it may be worth your time to follow the full installation tutorial so that you can make and test models from the command line. That is not needed to run the code, however.
+
+To view the manual page:
+	$ python
+	>>> import fasttext
+	>>> help(fasttext.FastText)
+
+The file "fasttext_models.py" will create all the models we need. The jupyter notebook entitled "fasttext_evaluation" will first run "fasttext_models.py" and then print some of the relevant data about these models so we can compare their efficacy.
+
+Before we create a model, the data must first be preprocessed. This entails putting the data from the json file into a correctly formatted txt file and ensuring the text is encoded with UTF-8
+Garrett did a wonderful job cleaning and lemizing the data, so the hard work is already done. Most of the preprocessing is about getting the desired format. The dataset must be converted to a text file with the proper data format so that the model can be trained.
+The data format for fasttext is: 
+	__label__<X>__label__<Y> ... <Text>
+Where X and Y are class labels.
+
+To achieve this, I filtered the json files, converted them to csv's (whose plaintext is easier to deal with), manipulated the string for each line, and then wrote the formatted string to a text file ending with ".train" Then I simply created the models like so:
+	model = fasttext.train_supervised(<data>, <hyperparameters>)
+
+After that, it is easy enough to save the models and do some anlaysis on their results. It should be pretty clear in the notebook how to get analytics on testing and how to pull out word vectors.
+
+
+
+////////// HELPFUL LINKS AND INFO \\\\\\\\\\
+How does fastText classifier work under the hood?
+https://towardsdatascience.com/fasttext-bag-of-tricks-for-efficient-text-classification-513ba9e302e7
+
+FastText text classification tutorial:
+https://fasttext.cc/docs/en/supervised-tutorial.html
+
+for analyzing word vectors, maybe: (Just a lot of fasttext functions)
+https://fasttext.cc/docs/en/python-module.html
+
