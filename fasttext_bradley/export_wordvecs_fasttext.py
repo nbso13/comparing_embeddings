@@ -1,8 +1,12 @@
 '''
-This module contains a function that returns a 10-tuple of document vector arrays (1 for each model)
+This module contains a function that returns a 2-tuple = (fasttext classifier, the training labels, the review texts)
 for use in sci kit's ML functions.
 
-I am arranging it based on:
+The input for make_vectors is the string name of the corresponding model described in fasttext_evaluation.ipynb.
+
+
+
+I am basing it off of:
 https://stackoverflow.com/questions/49236166/how-to-make-use-of-pre-trained-word-embeddings-when-training-a-model-in-sklearn
 to be used with sklearn.
     pseudo-code that may work:   
@@ -57,6 +61,9 @@ import numpy as np
 import pandas as pd 
 
 
+'''
+str_m = string name of the corresponding model described in fasttext_evaluation.ipynb
+'''
 def make_vectors(str_m) :
     def remove_labels(set) :
         # ( Recall the format for fasttext inputs: __label__<X>__label__<Y> ... <Text> )

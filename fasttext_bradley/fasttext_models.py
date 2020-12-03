@@ -9,7 +9,15 @@ the trained models themselves (saved in /models), and run a series of
 tests that compare the accuracy of the different models.
 '''
 
+BAD_WORDS = ['<','>','br','</s>','<s>','/><br']
+EPOCHS = 10
+MINCOUNT = 6000
+
 def format_uncleaned(df) :
+    '''
+    Formats the training set of uncleaned data
+    Saves as reviews_uncleaned.train
+    '''
     train = df.filter(['Score','Text'], axis=1)
     train['Score'] =train['Score'].apply(lambda r : "__label__" + str(r))
 
@@ -37,7 +45,15 @@ def format_uncleaned(df) :
             line = ''.join(line)
             formatted_lines.append(line)
 
+            # Get rid of HTML markdown tokens
+            splitline = line.split()
+            for word in BAD_WORDS :
+                while word in splitline :
+                    splitline.remove(word)
+            line = ' '.join(splitline)
+
         train = '\n'.join(formatted_lines)
+
         print("Preprocessed uncleaned data:")
         print(train[:500])
 
@@ -48,6 +64,10 @@ def format_uncleaned(df) :
 
 
 def format(df) :
+    '''
+    Formats the training set of cleaned data
+    Saves as reviews_cleaned.train
+    '''
     print()
     print('Preprocessing the data:')
 
@@ -83,7 +103,15 @@ def format(df) :
             line = ''.join(line)
             formatted_lines.append(line)
 
+            # Get rid of HTML markdown tokens
+            splitline = line.split()
+            for word in BAD_WORDS :
+                while word in splitline :
+                    splitline.remove(word)
+            line = ' '.join(splitline)
+
         train = '\n'.join(formatted_lines)
+
         print("Preprocessed cleaned data:")
         print(train[:500])
 
@@ -92,7 +120,12 @@ def format(df) :
 
 
 
-def test() :
+def make_tests() :
+    '''
+    Formats the testing set of both cleaned and uncleaned data
+    Saves one as reviews_cleaned.test
+    Saves other as reviews_uncleaned.test
+    '''
     # ///////// Build cleaned test set \\\\\\\\\\
     df = pd.read_json(r'reviews_test.json')
     test = df.filter(['Score', 'clean'],axis=1)
@@ -117,6 +150,9 @@ def test() :
             line[j] = ' '
             line = ''.join(line)
             formatted_lines.append(line)
+
+            # Not sure if I should remove HTML markdown tokens, so I will not
+            # to keep the integrity of the test data.
 
         test = '\n'.join(formatted_lines)
         final = open("reviews_cleaned.test", mode='w+', encoding='UTF-8')
@@ -159,25 +195,67 @@ def main() :
     print(df.head())
 
     # /////// PRE PROCESSING \\\\\\\\
-    # Get the correct format for fasttext module
+    # Get the correct format for fasttext module's training dataset
+    print("format()")
     format(df)
+    print("unclean format()")
+
     format_uncleaned(df)
 
+    print("Making tests")
     # make and save test sets
-    test()
+    make_tests()
+    print("Tests made.")
 
     # Make and save the models
-    print("m0: classifier trained on clean reviews")
-    m0 = fasttext.train_supervised("reviews_cleaned.train", epoch=10, dim=50)
-    #m1 = fasttext.train_supervised("reviews_cleaned.train", 'cbow', epoch=10, dim=50)
-    print("m2: classifier trained on uncleaned reviews")
-    m2 = fasttext.train_supervised("reviews_uncleaned.train", epoch=10, dim=50)
-    #m3 = fasttext.train_supervised("reviews_uncleaned.train", 'cbow', epoch=10, dim=50)
-    m4 = fasttext.train_supervised("reviews_cleaned.train", epoch=10, dim=50)
-    m0.save_model('fasttext_skipgram_cleaned.bin')
-    #m1.save_model('fasttext_cbow_cleaned.bin')
-    m2.save_model('fasttext_skipgram_uncleaned.bin')
-    #m3.save_model('fasttext_cbow_uncleaned.bin')
+    # Varying word vector dimension by 25, 50, 100, 200, 300
+    # Varying training data (cleaned and uncleaned)
+    print("mc0: classifier trained on clean reviews, 10 epochs, vector-size 25.")    
+    mc0 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=25, minCount=MINCOUNT)
+    mc0.save_model('fasttext_skipgram_uncleaned_D25.bin')
+    print('Models made.')
+
+    print("mc1: classifier trained on clean reviews, 10 epochs, vector-size 50.")    
+    mc1 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=50, minCount=MINCOUNT)
+
+    print("mc2: classifier trained on clean reviews, 10 epochs, vector-size 100.")    
+    mc2 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=100, minCount=MINCOUNT)
+
+    print("mc3: classifier trained on clean reviews, 10 epochs, vector-size 200.")    
+    mc3 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
+
+    print("mc4: classifier trained on clean reviews, 10 epochs, vector-size 200.")    
+    mc4 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
+
+    mcs = [mc0,mc1,mc2,mc3,mc4]
+
+    print("mu0: classifier trained on unclean reviews, 10 epochs, vector-size 25.")    
+    mu0 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=25, minCount=MINCOUNT)
+    
+    print("mu1: classifier trained on unclean reviews, 10 epochs, vector-size 50.")    
+    mu1 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=50, minCount=MINCOUNT)
+    
+    print("mu2: classifier trained on unclean reviews, 10 epochs, vector-size 100.")    
+    mu2 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=100, minCount=MINCOUNT)
+    
+    print("mu3: classifier trained on unclean reviews, 10 epochs, vector-size 200.")    
+    mu3 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
+    
+    print("mu4: classifier trained on unclean reviews, 10 epochs, vector-size 200.")    
+    mu4 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
+
+    mus = [mu0,mu1,mu2,mu3,mu4]
+
+    # Save all 10 models
+    Ds = ['25','50','100','200','300']
+    for m in mcs :
+        for d in Ds :
+            m.save_model('fasttext_skipgram_cleaned_D' + d +'.bin')
+    
+    for m in mus :
+        for d in Ds :
+            m.save_model('fasttext_skipgram_uncleaned_D' + d +'.bin')
+   
 
 
 
