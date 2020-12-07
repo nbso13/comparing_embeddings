@@ -21,11 +21,11 @@ def format_uncleaned(df) :
     train = df.filter(['Score','Text'], axis=1)
     train['Score'] =train['Score'].apply(lambda r : "__label__" + str(r))
 
-    train.to_csv(r'reviews_unclean_train.csv')
+    train.to_csv(r'data/reviews_unclean_train.csv')
 
     # format: 	__label__<X>__label__<Y> ... <Text>
     # encoding must be UTF-8
-    with open('reviews_unclean_train.csv', mode='r', encoding='UTF-8') as f :
+    with open('data/reviews_unclean_train.csv', mode='r', encoding='UTF-8') as f :
         train = f.read()
         lines = train.split('\n')
         lines.remove(lines[0])
@@ -57,7 +57,7 @@ def format_uncleaned(df) :
         print("Preprocessed uncleaned data:")
         print(train[:500])
 
-        final = open("reviews_uncleaned.train", mode='w+', encoding='UTF-8')
+        final = open("data/reviews_uncleaned.train", mode='w+', encoding='UTF-8')
         final.write(train)
 
 
@@ -79,11 +79,11 @@ def format(df) :
     # Output as text file with proper format
     # First output as csv, then read back in as txt because
     # the csv's plaintext is easier to manipulate
-    train.to_csv(r'reviews_train.csv')
+    train.to_csv(r'data/reviews_train.csv')
 
     # format: 	__label__<X>__label__<Y> ... <Text>
     # encoding must be UTF-8
-    with open('reviews_train.csv', mode='r', encoding='UTF-8') as f :
+    with open('data/reviews_train.csv', mode='r', encoding='UTF-8') as f :
         train = f.read()
         lines = train.split('\n')
         lines.remove(lines[0])
@@ -115,7 +115,7 @@ def format(df) :
         print("Preprocessed cleaned data:")
         print(train[:500])
 
-        final = open("reviews_cleaned.train", mode='w+', encoding='UTF-8')
+        final = open("data/reviews_cleaned.train", mode='w+', encoding='UTF-8')
         final.write(train)
 
 
@@ -127,13 +127,13 @@ def make_tests() :
     Saves other as reviews_uncleaned.test
     '''
     # ///////// Build cleaned test set \\\\\\\\\\
-    df = pd.read_json(r'reviews_test.json')
+    df = pd.read_json(r'data/reviews_test.json')
     test = df.filter(['Score', 'clean'],axis=1)
     test['Score'] = test['Score'].apply(lambda r : "__label__" + str(r))
-    test.to_csv(r'reviews_test.csv')
+    test.to_csv(r'data/reviews_test.csv')
 
     # format: 	__label__<X>__label__<Y> ... <Text>
-    with open('reviews_test.csv', mode='r', encoding='UTF-8') as f :
+    with open('data/reviews_test.csv', mode='r', encoding='UTF-8') as f :
         test = f.read()
         lines = test.split('\n')
         lines.remove(lines[0])
@@ -155,17 +155,17 @@ def make_tests() :
             # to keep the integrity of the test data.
 
         test = '\n'.join(formatted_lines)
-        final = open("reviews_cleaned.test", mode='w+', encoding='UTF-8')
+        final = open("data/reviews_cleaned.test", mode='w+', encoding='UTF-8')
         final.write(test)
     
     # //////// Build uncleaned test set \\\\\\\\\
-    df = pd.read_json(r'reviews_test.json')
+    df = pd.read_json(r'data/reviews_test.json')
     test = df.filter(['Score', 'Text'],axis=1)
     test['Score'] = test['Score'].apply(lambda r : "__label__" + str(r))
-    test.to_csv(r'reviews_uncleaned_test.csv')
+    test.to_csv(r'data/reviews_uncleaned_test.csv')
 
     # format: 	__label__<X>__label__<Y> ... <Text>
-    with open('reviews_uncleaned_test.csv', mode='r', encoding='UTF-8') as f :
+    with open('data/reviews_uncleaned_test.csv', mode='r', encoding='UTF-8') as f :
         test = f.read()
         lines = test.split('\n')
         lines.remove(lines[0])
@@ -184,13 +184,13 @@ def make_tests() :
             formatted_lines.append(line)
 
         test = '\n'.join(formatted_lines)
-        final = open("reviews_uncleaned.test", mode='w+', encoding='UTF-8')
+        final = open("data/reviews_uncleaned.test", mode='w+', encoding='UTF-8')
         final.write(test)
     
 
 
 def main() :
-    df = pd.read_json(r'reviews_train.json')
+    df = pd.read_json(r'data/reviews_train.json')
     print("reviews_train.json loaded:")
     print(df.head())
 
@@ -211,38 +211,38 @@ def main() :
     # Varying word vector dimension by 25, 50, 100, 200, 300
     # Varying training data (cleaned and uncleaned)
     print("mc0: classifier trained on clean reviews, 10 epochs, vector-size 25.")    
-    mc0 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=25, minCount=MINCOUNT)
-    mc0.save_model('fasttext_skipgram_uncleaned_D25.bin')
+    mc0 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=25, minCount=MINCOUNT)
+    mc0.save_model('data/fasttext_skipgram_uncleaned_D25.bin')
     print('Models made.')
 
     print("mc1: classifier trained on clean reviews, 10 epochs, vector-size 50.")    
-    mc1 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=50, minCount=MINCOUNT)
+    mc1 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=50, minCount=MINCOUNT)
 
     print("mc2: classifier trained on clean reviews, 10 epochs, vector-size 100.")    
-    mc2 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=100, minCount=MINCOUNT)
+    mc2 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=100, minCount=MINCOUNT)
 
     print("mc3: classifier trained on clean reviews, 10 epochs, vector-size 200.")    
-    mc3 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
+    mc3 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
 
     print("mc4: classifier trained on clean reviews, 10 epochs, vector-size 200.")    
-    mc4 = fasttext.train_supervised("reviews_cleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
+    mc4 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
 
     mcs = [mc0,mc1,mc2,mc3,mc4]
 
     print("mu0: classifier trained on unclean reviews, 10 epochs, vector-size 25.")    
-    mu0 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=25, minCount=MINCOUNT)
+    mu0 = fasttext.train_supervised("data/reviews_uncleaned.train", epoch=EPOCHS, dim=25, minCount=MINCOUNT)
     
     print("mu1: classifier trained on unclean reviews, 10 epochs, vector-size 50.")    
-    mu1 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=50, minCount=MINCOUNT)
+    mu1 = fasttext.train_supervised("data/reviews_uncleaned.train", epoch=EPOCHS, dim=50, minCount=MINCOUNT)
     
     print("mu2: classifier trained on unclean reviews, 10 epochs, vector-size 100.")    
-    mu2 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=100, minCount=MINCOUNT)
+    mu2 = fasttext.train_supervised("data/reviews_uncleaned.train", epoch=EPOCHS, dim=100, minCount=MINCOUNT)
     
     print("mu3: classifier trained on unclean reviews, 10 epochs, vector-size 200.")    
-    mu3 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
+    mu3 = fasttext.train_supervised("data/reviews_uncleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
     
     print("mu4: classifier trained on unclean reviews, 10 epochs, vector-size 200.")    
-    mu4 = fasttext.train_supervised("reviews_uncleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
+    mu4 = fasttext.train_supervised("data/reviews_uncleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
 
     mus = [mu0,mu1,mu2,mu3,mu4]
 
@@ -250,11 +250,11 @@ def main() :
     Ds = ['25','50','100','200','300']
     for m in mcs :
         for d in Ds :
-            m.save_model('fasttext_skipgram_cleaned_D' + d +'.bin')
+            m.save_model('data/fasttext_skipgram_cleaned_D' + d +'.bin')
     
     for m in mus :
         for d in Ds :
-            m.save_model('fasttext_skipgram_uncleaned_D' + d +'.bin')
+            m.save_model('data/fasttext_skipgram_uncleaned_D' + d +'.bin')
    
 
 

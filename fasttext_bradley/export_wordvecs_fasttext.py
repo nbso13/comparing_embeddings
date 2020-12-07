@@ -93,38 +93,44 @@ def make_vectors(str_m) :
 
     def load_model(m) :
         if (m == "mc0") :
-            ret = fasttext.load_model('fasttext_skipgram_cleaned_D25.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D25.bin')
         elif(m == "mc1") :
-            ret = fasttext.load_model('fasttext_skipgram_cleaned_D50.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D50.bin')
         elif(m == "mc2") :
-            ret = fasttext.load_model('fasttext_skipgram_cleaned_D100.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D100.bin')
         elif(m == "mc3") :
-            ret = fasttext.load_model('fasttext_skipgram_cleaned_D200.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D200.bin')
         elif(m == "mc4") :
-            ret = fasttext.load_model('fasttext_skipgram_cleaned_D300.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D300.bin')
         elif(m == "mu0") :
-            ret = fasttext.load_model('fasttext_skipgram_uncleaned_D25.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D25.bin')
         elif(m == "mu1") :
-            ret = fasttext.load_model('fasttext_skipgram_uncleaned_D50.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D50.bin')
         elif(m == "mu2") :
-            ret = fasttext.load_model('fasttext_skipgram_uncleaned_D100.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D100.bin')
         elif(m == "mu3") :
-            ret = fasttext.load_model('fasttext_skipgram_uncleaned_D200.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D200.bin')
         elif(m == "mu4") :
-            ret = fasttext.load_model('fasttext_skipgram_uncleaned_D300.bin')
+            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D300.bin')
         else :
             print("ERROR: load_model() in make_vectors() : Input must be format 'mc#' or 'mu#'")
         return ret
 
     m = load_model(str_m)
 
+    train = open("reviews_cleaned.train", mode='r', encoding='UTF-8')
+    labels, reviews = remove_labels(train)
+
+    '''
+    wait, i dont think we should test on clean data? Im tired.
     if (str_m[1] == 'c') :
         train = open("reviews_cleaned.train", mode='r', encoding='UTF-8')
         labels, reviews = remove_labels(train)
     elif (str_m[1] == 'u') :
         train = open("reviews_uncleaned.train", mode='r', encoding='UTF-8')
         labels, reviews = remove_labels(train)
-    
+    '''
+
     (labels, reviews, vectors) = return_vectors(m, labels, reviews)
 
     return (labels, reviews, vectors)
