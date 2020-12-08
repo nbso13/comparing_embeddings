@@ -212,8 +212,6 @@ def main() :
     # Varying training data (cleaned and uncleaned)
     print("mc0: classifier trained on clean reviews, 10 epochs, vector-size 25.")    
     mc0 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=25, minCount=MINCOUNT)
-    mc0.save_model('data/fasttext_skipgram_uncleaned_D25.bin')
-    print('Models made.')
 
     print("mc1: classifier trained on clean reviews, 10 epochs, vector-size 50.")    
     mc1 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=50, minCount=MINCOUNT)
@@ -224,7 +222,7 @@ def main() :
     print("mc3: classifier trained on clean reviews, 10 epochs, vector-size 200.")    
     mc3 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
 
-    print("mc4: classifier trained on clean reviews, 10 epochs, vector-size 200.")    
+    print("mc4: classifier trained on clean reviews, 10 epochs, vector-size 300.")    
     mc4 = fasttext.train_supervised("data/reviews_cleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
 
     mcs = [mc0,mc1,mc2,mc3,mc4]
@@ -241,22 +239,29 @@ def main() :
     print("mu3: classifier trained on unclean reviews, 10 epochs, vector-size 200.")    
     mu3 = fasttext.train_supervised("data/reviews_uncleaned.train", epoch=EPOCHS, dim=200, minCount=MINCOUNT)
     
-    print("mu4: classifier trained on unclean reviews, 10 epochs, vector-size 200.")    
+    print("mu4: classifier trained on unclean reviews, 10 epochs, vector-size 300.")    
     mu4 = fasttext.train_supervised("data/reviews_uncleaned.train", epoch=EPOCHS, dim=300, minCount=MINCOUNT)
+    print('Models made.')
 
     mus = [mu0,mu1,mu2,mu3,mu4]
 
     # Save all 10 models
     Ds = ['25','50','100','200','300']
+    d = 0
+    print(d)
     for m in mcs :
-        for d in Ds :
-            m.save_model('data/fasttext_skipgram_cleaned_D' + d +'.bin')
+        m.save_model('data/fasttext_skipgram_cleaned_D' + Ds[d] +'.bin')
+        d+=1
+        print(m.get_dimension())
     
+    d = 0
     for m in mus :
-        for d in Ds :
-            m.save_model('data/fasttext_skipgram_uncleaned_D' + d +'.bin')
-   
+        m.save_model('data/fasttext_skipgram_uncleaned_D' + Ds[d] +'.bin')
+        d+=1
+    print('Models saved.')
 
+    return (mcs, mus)
+   
 
 
 if __name__ == "__main__" :
