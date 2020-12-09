@@ -7,19 +7,6 @@ The input for make_vectors is the string name of the corresponding model describ
 I am basing it off of:
 https://stackoverflow.com/questions/49236166/how-to-make-use-of-pre-trained-word-embeddings-when-training-a-model-in-sklearn
 to be used with sklearn.
-    pseudo-code that may work:   
-        import export_wordvecs_fasttext as wv
-
-        word_vecs_matrix = wv.make_vectors(model)    # model = e.g. mu1
-
-        def transform(x):
-            return word_vecs_matrix[x]
-        transformer = FunctionTransformer(transform)
-
-        # the transformer can be passed into a logistic regression with Pipeline
-        # (I am fuzzy on the details of this)
-        pip = Pipeline([(Countvectorizer()), (TfidfTransformer()), (Classifier())])
-        pip.fit(X_train, y_train)
 
 Before using these functions,  user should first make the models in fasttext_evaluation.ipynb or 
 fasttext_models.py. The notebook includes a sci kit evaluation section as well.
@@ -120,6 +107,8 @@ get_vectors(m):
     Given a model m, extract the embeddings.
     **Right now, models are assumed to be trained on cleaned data**
     Return 3-tuple with (listof labels, listof reviews, listof embeddings) all indexed the same.
+    If m is a string, get_vectors will load the appropriate model corresponding to it's name
+    in fasttext_models.py
 '''
 def get_vectors(m) :
     if type(m) == str :
@@ -133,5 +122,3 @@ def get_vectors(m) :
     (labels, reviews, vectors) = return_vectors(m, labels, reviews)   
 
     return (labels, reviews, vectors)
-
-get_vectors('mc2')
