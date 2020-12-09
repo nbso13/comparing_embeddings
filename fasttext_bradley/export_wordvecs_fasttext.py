@@ -1,10 +1,8 @@
 '''
-This module contains a function that returns a 2-tuple = (fasttext classifier, the training labels, the review texts)
+This module contains a function that returns a 3-tuple = (labels, the reviews, and embeddings of the review)
 for use in sci kit's ML functions.
 
 The input for make_vectors is the string name of the corresponding model described in fasttext_evaluation.ipynb.
-
-
 
 I am basing it off of:
 https://stackoverflow.com/questions/49236166/how-to-make-use-of-pre-trained-word-embeddings-when-training-a-model-in-sklearn
@@ -23,9 +21,9 @@ to be used with sklearn.
         pip = Pipeline([(Countvectorizer()), (TfidfTransformer()), (Classifier())])
         pip.fit(X_train, y_train)
 
-Before using these functions,  user should make the models in fasttext_evaluation.ipynb
+Before using these functions,  user should first make the models in fasttext_evaluation.ipynb or 
+fasttext_models.py. The notebook includes a sci kit evaluation section as well.
 '''
-
 '''
 It may be useful for you to glance at the model object, in case you need to edit the code and
 get different information from the models.
@@ -56,81 +54,84 @@ from https://fasttext.cc/docs/en/python-module.html :
     test                    # Evaluate supervised model using file given by path
     test_label              # Return the precision and recall score for each label.    
 '''
+
 import fasttext
 import numpy as np 
 import pandas as pd 
 
+def load_model(m) :
+    if (m == "mc0") :
+        ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D25.bin')
+    elif(m == "mc1") :
+        ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D50.bin')
+    elif(m == "mc2") :
+        ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D100.bin')
+    elif(m == "mc3") :
+        ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D200.bin')
+    elif(m == "mc4") :
+        ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D300.bin')
+    elif(m == "mu0") :
+        ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D25.bin')
+    elif(m == "mu1") :
+        ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D50.bin')
+    elif(m == "mu2") :
+        ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D100.bin')
+    elif(m == "mu3") :
+        ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D200.bin')
+    elif(m == "mu4") :
+        ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D300.bin')
+    else :
+        print("ERROR: load_model() in make_vectors() : Input must be format 'mc#' or 'mu#'")
+    return ret
+    
+
+
+def remove_labels(data) :
+    # ( Recall the format for fasttext inputs: __label__<X>__label__<Y> ... <Text> )
+    # split the label from the text in the dataset and return tuple (labels, reviews)
+    # (labels, reviews) == (list of labels, list of review text)
+    labels = []
+    reviews = []
+    # split on each label+review pair
+    data = data.split('\n')
+    for line in data :
+        # split label from review
+        line = line.split(' ', 1)
+        labels.append(line[0])
+        reviews.append(line[1])
+    return (labels, reviews)
+
+
+
+def return_vectors(m, labels, reviews) :
+    # returns a 3-tuple (labels, reviews, embeddings)
+    # (labels, reviews, embeddings) == (list of labels, list of review texts, list of review text vectors)
+    # return_vectors really just generates vectors for each review and populates a list that matches on index.
+    embeddings = []
+    for review in reviews :
+        embeddings.append(m.get_sentence_vector(review))
+
+    return (labels, reviews, embeddings)
+
+
 
 '''
-str_m = string name of the corresponding model described in fasttext_evaluation.ipynb
+get_vectors(m):
+    Given a model m, extract the embeddings.
+    **Right now, models are assumed to be trained on cleaned data**
+    Return 3-tuple with (listof labels, listof reviews, listof embeddings) all indexed the same.
 '''
-def make_vectors(str_m) :
-    def remove_labels(set) :
-        # ( Recall the format for fasttext inputs: __label__<X>__label__<Y> ... <Text> )
-        # split the label from the text in the dataset and return tuple (labels, reviews)
-        # (labels, reviews) == (list of labels, list of review text)
-        labels = []
-        reviews = []
+def get_vectors(m) :
+    if type(m) == str :
+        m = load_model(m)
 
-        # split on each label+review pair
-        set.split('\n')
-        for line in set :
-            # split label from review
-            line.split(' ', 1)
-            labels.append(line[0])
-            reviews.append(line[1])
-        return (labels, reviews)
+    train = open("data/reviews_cleaned.train", mode='r', encoding='UTF-8')
+    train = train.read()
 
-    def return_vectors(m, labels, reviews) :
-        # returns a 3-tuple (labels, reviews, embeddings)
-        # (labels, reviews, embeddings) == (list of labels, list of review texts, list of review text vectors)
-        # return_vectors really just generates vectors for each review and populates a list that matches on index.
-        embeddings = []
-        for review in reviews :
-            embeddings.append(m.get_sentence_vector(review))
-
-        return (labels, reviews, embeddings)
-
-    def load_model(m) :
-        if (m == "mc0") :
-            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D25.bin')
-        elif(m == "mc1") :
-            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D50.bin')
-        elif(m == "mc2") :
-            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D100.bin')
-        elif(m == "mc3") :
-            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D200.bin')
-        elif(m == "mc4") :
-            ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D300.bin')
-        elif(m == "mu0") :
-            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D25.bin')
-        elif(m == "mu1") :
-            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D50.bin')
-        elif(m == "mu2") :
-            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D100.bin')
-        elif(m == "mu3") :
-            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D200.bin')
-        elif(m == "mu4") :
-            ret = fasttext.load_model('data/fasttext_skipgram_uncleaned_D300.bin')
-        else :
-            print("ERROR: load_model() in make_vectors() : Input must be format 'mc#' or 'mu#'")
-        return ret
-
-    m = load_model(str_m)
-
-    train = open("reviews_cleaned.train", mode='r', encoding='UTF-8')
     labels, reviews = remove_labels(train)
 
-    '''
-    wait, i dont think we should test on clean data? Im tired.
-    if (str_m[1] == 'c') :
-        train = open("reviews_cleaned.train", mode='r', encoding='UTF-8')
-        labels, reviews = remove_labels(train)
-    elif (str_m[1] == 'u') :
-        train = open("reviews_uncleaned.train", mode='r', encoding='UTF-8')
-        labels, reviews = remove_labels(train)
-    '''
-
-    (labels, reviews, vectors) = return_vectors(m, labels, reviews)
+    (labels, reviews, vectors) = return_vectors(m, labels, reviews)   
 
     return (labels, reviews, vectors)
+
+get_vectors('mc2')
