@@ -10,6 +10,28 @@ Unfortunately, this is the easiest way to do this.
 Take FastText team's word for it: https://github.com/facebookresearch/fastText/issues/261
 '''
 
+
+
+# A function that will return the a 3tuple (listof guesses, listof test labels, listof reviews), all matching index
+# input is a fasttext.model object, listof String labels, listof String reviews)
+def get_guesses(m, labels, reviews) :
+    if len(labels) != len(reviews) :
+        print("Error: get_accuracy, run_test : labels different length than reviews")
+        print(len(labels), len(reviews))
+
+    guesses = []
+    n = len(labels)
+
+    for i in range(len(labels)) :
+        guess = m.predict(reviews[i])
+        # retrieve guess, format : (('__label__5',), array([0.72070283]))
+        guess = guess[0][0]
+        guesses.append(guess)
+
+    return (guesses, reviews, labels)
+
+
+
 def load_model(m) :
         if (m == "mc0") :
             ret = fasttext.load_model('data/fasttext_skipgram_cleaned_D25.bin')
@@ -52,10 +74,11 @@ def run_tests(m, labels, reviews) :
         if guess == labels[i] :
             hits += 1
 
-    return hits / n
+    return (hits / n, labels, reviews)
 
 
-
+# get_accuracy(m) now returns a 3tuple of the (accuracy, listof test labels, listof reviews)
+# to make analysis easier
 def get_accuracy(m) :
     # load data if given a string
     # if given a fasttext.model object, proceed
