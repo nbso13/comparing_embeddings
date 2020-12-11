@@ -28,7 +28,6 @@ def format_uncleaned(df) :
     # encoding must be UTF-8
     with open('data/reviews_unclean_train.csv', mode='r', encoding='UTF-8') as f :
         train = f.read()
-        if BAD_WORDS[0] in train :
         lines = train.split('\n')
         lines.remove(lines[0])
         lines.remove(lines[-1]) 
@@ -57,7 +56,6 @@ def format_uncleaned(df) :
         train = '\n'.join(formatted_lines)
 
         print("Preprocessed uncleaned data:")
-        if BAD_WORDS[0] in train :
         final = open("data/reviews_uncleaned.train", mode='w+', encoding='UTF-8')
         final.write(train)
 
