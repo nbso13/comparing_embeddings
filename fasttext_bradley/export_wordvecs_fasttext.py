@@ -2,6 +2,9 @@
 This module contains a function that returns a 3-tuple = (labels, the reviews, and embeddings of the review)
 for use in sci kit's ML functions.
 
+
+
+
 The input for make_vectors is the string name of the corresponding model described in fasttext_evaluation.ipynb.
 
 I am basing it off of:
